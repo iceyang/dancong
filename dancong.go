@@ -1,47 +1,34 @@
 package dancong
 
 import (
-	"context"
-
-	"github.com/iceyang/dancong/pkg/runner"
 	"go.uber.org/fx"
 )
 
 type dancong struct {
-	app fx.App
-
 	// Dancong Context
 	ctx *Context
 
-	// fxOptions
+	// fx module
+	fxApp     *fx.App
 	fxOptions fx.Option
 }
 
-func New() *dancong {
-	return &dancong{
+// Create a dancong application
+func New(opts ...Option) *dancong {
+	dc := &dancong{
+		ctx:       &Context{},
 		fxOptions: fx.Options(),
 	}
-}
 
-// Invoke Runner
-func (dc *dancong) AddRunner(r runner.Runner) {
-	dc.fxOptions = fx.Options(
-		dc.fxOptions,
-		fx.Invoke(func(lc fx.Lifecycle) {
-			lc.Append(fx.Hook{
-				OnStart: func(context.Context) error {
-					return r.Start(dc.ctx)
-				},
-				OnStop: func(context.Context) error {
-					return r.Stop(dc.ctx)
-				},
-			})
-		}),
-	)
+	for _, opt := range opts {
+		opt.apply(dc)
+	}
+
+	dc.fxApp = fx.New(dc.fxOptions)
+	return dc
 }
 
 // Start Application
 func (dc *dancong) Run() {
-	dc.app = fx.New(dc.fxOptions)
-	dc.app.Run()
+	dc.fxApp.Run()
 }

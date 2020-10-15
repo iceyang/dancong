@@ -1,0 +1,5 @@
+test:
+  a: 1
+http:
+  addr: ":3000"
+  addr2: 3000

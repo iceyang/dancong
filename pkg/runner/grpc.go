@@ -10,7 +10,7 @@ import (
 )
 
 type GrpcRunner struct {
-	server *grpc.Server
+	Server *grpc.Server
 
 	// listening address
 	Addr string
@@ -22,7 +22,7 @@ func (runner *GrpcRunner) Start(ctx *dancong.Context) error {
 		if err != nil {
 			log.Fatalf("listen: %s\n", err)
 		}
-		runner.server.Serve(lis)
+		runner.Server.Serve(lis)
 	}()
 	return nil
 }

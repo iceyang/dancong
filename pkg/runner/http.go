@@ -14,13 +14,16 @@ type HttpRunner struct {
 	server *http.Server
 
 	// listening address
-	Addr string
+	addr string
 }
 
 func (runner *HttpRunner) Start(ctx *dancong.Context) error {
+	v, _ := ctx.GetConfig("http.addr")
+	addr := v.(string)
+	log.Printf("Starting HTTP server. Listening at %s\n", addr)
 	go func() {
 		runner.server = &http.Server{
-			Addr:    runner.Addr,
+			Addr:    addr,
 			Handler: runner.Handler,
 		}
 
