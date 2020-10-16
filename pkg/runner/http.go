@@ -9,12 +9,20 @@ import (
 )
 
 type HttpRunner struct {
-	Handler http.Handler
+	BaseRunner
+
+	handler http.Handler
 
 	server *http.Server
 
 	// listening address
 	addr string
+}
+
+func (runner *HttpRunner) Init(ctx *dancong.Context) interface{} {
+	return func(handler http.Handler) {
+		runner.handler = handler
+	}
 }
 
 func (runner *HttpRunner) Start(ctx *dancong.Context) error {
@@ -24,9 +32,8 @@ func (runner *HttpRunner) Start(ctx *dancong.Context) error {
 	go func() {
 		runner.server = &http.Server{
 			Addr:    addr,
-			Handler: runner.Handler,
+			Handler: runner.handler,
 		}
-
 		err := runner.server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)

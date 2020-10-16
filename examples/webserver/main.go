@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/iceyang/dancong"
 	"github.com/iceyang/dancong/pkg/runner"
@@ -16,9 +18,10 @@ func main() {
 	})
 
 	opts := dancong.Options(
-		dancong.WithRunner(&runner.HttpRunner{
-			Handler: e,
+		dancong.WithBean(func() http.Handler {
+			return e
 		}),
+		dancong.WithRunner(&runner.HttpRunner{}),
 		dancong.WithRunner(&runner.GrpcRunner{
 			Server: grpc.NewServer(),
 			Addr:   ":10000",

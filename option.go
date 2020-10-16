@@ -24,7 +24,7 @@ type runnerOption struct {
 }
 
 func (o runnerOption) apply(dc *dancong) {
-	invoke := fx.Invoke(func(lc fx.Lifecycle) {
+	invokeLifecycle := func(lc fx.Lifecycle) {
 		lc.Append(fx.Hook{
 			OnStart: func(context.Context) error {
 				return o.runner.Start(dc.ctx)
@@ -33,7 +33,11 @@ func (o runnerOption) apply(dc *dancong) {
 				return o.runner.Stop(dc.ctx)
 			},
 		})
-	})
+	}
+	invoke := fx.Invoke(
+		o.runner.Init(dc.ctx),
+		invokeLifecycle,
+	)
 	dc.fxOptions = fx.Options(dc.fxOptions, invoke)
 }
 
@@ -49,7 +53,7 @@ type beanOption struct {
 func (o beanOption) apply(dc *dancong) {
 	dc.fxOptions = fx.Options(
 		dc.fxOptions,
-		fx.Provide(o.constructors),
+		fx.Provide(o.constructors...),
 	)
 }
 

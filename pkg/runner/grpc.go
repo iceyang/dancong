@@ -10,6 +10,8 @@ import (
 )
 
 type GrpcRunner struct {
+	BaseRunner
+
 	Server *grpc.Server
 
 	// listening address

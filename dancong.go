@@ -7,6 +7,8 @@ import (
 type dancong struct {
 	// Dancong Context
 	ctx *Context
+	// the initial options
+	opts options
 
 	// fx module
 	fxApp     *fx.App
@@ -17,6 +19,7 @@ type dancong struct {
 func New(opts ...Option) *dancong {
 	dc := &dancong{
 		ctx:       &Context{},
+		opts:      opts,
 		fxOptions: fx.Options(),
 	}
 
