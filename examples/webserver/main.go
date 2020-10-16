@@ -10,22 +10,25 @@ import (
 )
 
 func main() {
-	e := gin.New()
-	e.Any("/", func(c *gin.Context) {
-		c.JSON(200, &gin.H{
-			"Hello": "Dancong App",
-		})
-	})
-
 	opts := dancong.Options(
-		dancong.WithBean(func() http.Handler {
-			return e
-		}),
-		dancong.WithRunner(&runner.HttpRunner{}),
-		dancong.WithRunner(&runner.GrpcRunner{
-			Server: grpc.NewServer(),
-			Addr:   ":10000",
-		}),
+		dancong.WithBean(
+			func() http.Handler {
+				e := gin.New()
+				e.Any("/", func(c *gin.Context) {
+					c.JSON(200, &gin.H{
+						"Hello": "Dancong App",
+					})
+				})
+				return e
+			},
+			func() *grpc.Server {
+				return grpc.NewServer()
+			},
+		),
+		dancong.WithRunner(
+			runner.HttpRunner,
+			runner.GrpcRunner,
+		),
 		dancong.WithConfig("./config.yaml"),
 	)
 

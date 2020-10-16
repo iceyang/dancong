@@ -8,27 +8,29 @@ import (
 	"github.com/iceyang/dancong"
 )
 
-type HttpRunner struct {
+const HttpRunner = "httpRunner"
+
+type httpRunner struct {
 	BaseRunner
 
 	handler http.Handler
-
-	server *http.Server
-
-	// listening address
-	addr string
+	server  *http.Server
 }
 
-func (runner *HttpRunner) Init(ctx *dancong.Context) interface{} {
+func init() {
+	dancong.RegisterRunner(HttpRunner, &httpRunner{})
+}
+
+func (runner *httpRunner) Init(ctx *dancong.Context) interface{} {
 	return func(handler http.Handler) {
 		runner.handler = handler
 	}
 }
 
-func (runner *HttpRunner) Start(ctx *dancong.Context) error {
+func (runner *httpRunner) Start(ctx *dancong.Context) error {
 	v, _ := ctx.GetConfig("http.addr")
 	addr := v.(string)
-	log.Printf("Starting HTTP server. Listening at %s\n", addr)
+	log.Printf("[Dancong] Starting HTTP server. Listening at %s\n", addr)
 	go func() {
 		runner.server = &http.Server{
 			Addr:    addr,
@@ -42,6 +44,6 @@ func (runner *HttpRunner) Start(ctx *dancong.Context) error {
 	return nil
 }
 
-func (runner *HttpRunner) Stop(ctx *dancong.Context) error {
+func (runner *httpRunner) Stop(ctx *dancong.Context) error {
 	return runner.server.Shutdown(context.TODO())
 }

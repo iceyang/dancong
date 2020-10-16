@@ -15,30 +15,36 @@ type Option interface {
 
 // WithRunner will apply runner to fx 'invokes',
 // Runner will start when app start.
-func WithRunner(r Runner) Option {
-	return runnerOption{runner: r}
+func WithRunner(runnerNames ...string) Option {
+	return runnerOption{runnerNames: runnerNames}
 }
 
 type runnerOption struct {
-	runner Runner
+	runnerNames []string
 }
 
 func (o runnerOption) apply(dc *dancong) {
-	invokeLifecycle := func(lc fx.Lifecycle) {
-		lc.Append(fx.Hook{
-			OnStart: func(context.Context) error {
-				return o.runner.Start(dc.ctx)
-			},
-			OnStop: func(context.Context) error {
-				return o.runner.Stop(dc.ctx)
-			},
-		})
+	for _, name := range o.runnerNames {
+		runner, ok := GetRunner(name)
+		if !ok {
+			log.Fatalf("[Dancong] runner %s is not exists.", name)
+		}
+		invokeLifecycle := func(lc fx.Lifecycle) {
+			lc.Append(fx.Hook{
+				OnStart: func(context.Context) error {
+					return runner.Start(dc.ctx)
+				},
+				OnStop: func(context.Context) error {
+					return runner.Stop(dc.ctx)
+				},
+			})
+		}
+		invoke := fx.Invoke(
+			runner.Init(dc.ctx),
+			invokeLifecycle,
+		)
+		dc.fxOptions = fx.Options(dc.fxOptions, invoke)
 	}
-	invoke := fx.Invoke(
-		o.runner.Init(dc.ctx),
-		invokeLifecycle,
-	)
-	dc.fxOptions = fx.Options(dc.fxOptions, invoke)
 }
 
 // WithBean will using constructors as providers
