@@ -6,7 +6,7 @@ import (
 
 type BaseRunner struct{}
 
-func (runner *BaseRunner) Init(ctx *dancong.Context) interface{} {
+func (runner *BaseRunner) PreStart(ctx *dancong.Context) interface{} {
 	return func() {}
 }
 

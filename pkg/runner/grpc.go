@@ -21,7 +21,7 @@ func init() {
 	dancong.RegisterRunner(GrpcRunner, &grpcRunner{})
 }
 
-func (runner *grpcRunner) Init(ctx *dancong.Context) interface{} {
+func (runner *grpcRunner) PreStart(ctx *dancong.Context) interface{} {
 	return func(server *grpc.Server) {
 		runner.server = server
 	}

@@ -40,7 +40,7 @@ func (o runnerOption) apply(dc *dancong) {
 			})
 		}
 		invoke := fx.Invoke(
-			runner.Init(dc.ctx),
+			runner.PreStart(dc.ctx),
 			invokeLifecycle,
 		)
 		dc.fxOptions = fx.Options(dc.fxOptions, invoke)

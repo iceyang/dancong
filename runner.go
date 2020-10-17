@@ -1,7 +1,7 @@
 package dancong
 
 type Runner interface {
-	Init(*Context) interface{}
+	PreStart(*Context) interface{}
 	Start(*Context) error
 	Stop(*Context) error
 }

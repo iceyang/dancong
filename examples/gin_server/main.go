@@ -6,11 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iceyang/dancong"
 	"github.com/iceyang/dancong/pkg/runner"
-	"google.golang.org/grpc"
 )
 
 func main() {
 	opts := dancong.Options(
+		// Add http Handler for http service
 		dancong.WithBean(
 			func() http.Handler {
 				e := gin.New()
@@ -21,15 +21,13 @@ func main() {
 				})
 				return e
 			},
-			func() *grpc.Server {
-				return grpc.NewServer()
-			},
 		),
+		// Add http service
 		dancong.WithRunner(
 			runner.HttpRunner,
-			runner.GrpcRunner,
 		),
-		dancong.WithConfig("./config.yaml"),
+		// Load config fle
+		dancong.WithConfig("./dancong.yaml"),
 	)
 
 	dc := dancong.New(opts)

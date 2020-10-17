@@ -21,7 +21,7 @@ func init() {
 	dancong.RegisterRunner(HttpRunner, &httpRunner{})
 }
 
-func (runner *httpRunner) Init(ctx *dancong.Context) interface{} {
+func (runner *httpRunner) PreStart(ctx *dancong.Context) interface{} {
 	return func(handler http.Handler) {
 		runner.handler = handler
 	}
