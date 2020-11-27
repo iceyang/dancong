@@ -1,26 +1,33 @@
 package dancong
 
 import (
+	"github.com/iceyang/dancong/internal/log"
+	logrus "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 )
 
-type dancong struct {
+type Dancong struct {
 	// Dancong Context
 	ctx *Context
 	// the initial options
 	opts options
+
+	logger *logrus.Logger
 
 	// fx module
 	fxApp     *fx.App
 	fxOptions fx.Option
 }
 
-// Create a dancong application
-func New(opts ...Option) *dancong {
-	dc := &dancong{
-		ctx:       &Context{},
+// Create a Dancong application
+func New(opts ...Option) *Dancong {
+	logger := log.DefaultLogger()
+
+	dc := &Dancong{
+		ctx:       NewContext(),
 		opts:      opts,
-		fxOptions: fx.Options(),
+		logger:    logger,
+		fxOptions: fx.Logger(logger),
 	}
 
 	for _, opt := range opts {
@@ -31,7 +38,15 @@ func New(opts ...Option) *dancong {
 	return dc
 }
 
+func (dc *Dancong) GetContext() *Context {
+	return dc.ctx
+}
+
+func (dc *Dancong) GetLogger() *logrus.Logger {
+	return dc.logger
+}
+
 // Start Application
-func (dc *dancong) Run() {
+func (dc *Dancong) Run() {
 	dc.fxApp.Run()
 }

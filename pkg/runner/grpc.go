@@ -2,7 +2,6 @@ package runner
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/iceyang/dancong"
@@ -21,20 +20,21 @@ func init() {
 	dancong.RegisterRunner(GrpcRunner, &grpcRunner{})
 }
 
-func (runner *grpcRunner) PreStart(ctx *dancong.Context) interface{} {
+func (runner *grpcRunner) PreStart(dc *dancong.Dancong) interface{} {
 	return func(server *grpc.Server) {
 		runner.server = server
 	}
 }
 
-func (runner *grpcRunner) Start(ctx *dancong.Context) error {
+func (runner *grpcRunner) Start(dc *dancong.Dancong) error {
+	ctx := dc.GetContext()
 	v, _ := ctx.GetConfig("grpc.addr")
 	addr := v.(string)
-	log.Printf("[Dancong] Starting GRPC server. Listening at %s\n", addr)
+	dc.GetLogger().Infof("[Dancong] Starting GRPC server. Listening at %s\n", addr)
 	go func() {
 		lis, err := net.Listen("tcp", fmt.Sprintf(addr))
 		if err != nil {
-			log.Fatalf("listen: %s\n", err)
+			dc.GetLogger().Fatalf("listen: %s\n", err)
 		}
 		runner.server.Serve(lis)
 	}()

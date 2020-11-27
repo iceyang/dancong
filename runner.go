@@ -3,9 +3,9 @@ package dancong
 import "log"
 
 type Runner interface {
-	PreStart(*Context) interface{}
-	Start(*Context) error
-	Stop(*Context) error
+	PreStart(*Dancong) interface{}
+	Start(*Dancong) error
+	Stop(*Dancong) error
 }
 
 type Runners map[string]Runner

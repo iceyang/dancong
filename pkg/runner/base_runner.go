@@ -6,14 +6,14 @@ import (
 
 type BaseRunner struct{}
 
-func (runner *BaseRunner) PreStart(ctx *dancong.Context) interface{} {
+func (runner *BaseRunner) PreStart(dc *dancong.Dancong) interface{} {
 	return func() {}
 }
 
-func (runner *BaseRunner) Start(ctx *dancong.Context) error {
+func (runner *BaseRunner) Start(dc *dancong.Dancong) error {
 	return nil
 }
 
-func (runner *BaseRunner) Stop(ctx *dancong.Context) error {
+func (runner *BaseRunner) Stop(dc *dancong.Dancong) error {
 	return nil
 }

@@ -3,14 +3,14 @@ package dancong
 import (
 	"context"
 	"io/ioutil"
-	"log"
 
+	logrus "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 	"gopkg.in/yaml.v2"
 )
 
 type Option interface {
-	apply(*dancong)
+	apply(*Dancong)
 }
 
 // WithRunner will apply runner to fx 'invokes',
@@ -23,24 +23,24 @@ type runnerOption struct {
 	runnerNames []string
 }
 
-func (o runnerOption) apply(dc *dancong) {
+func (o runnerOption) apply(dc *Dancong) {
 	for _, name := range o.runnerNames {
 		runner, ok := GetRunner(name)
 		if !ok {
-			log.Fatalf("[Dancong] runner %s is not exists.", name)
+			dc.logger.Fatalf("[Dancong] runner %s is not exists.", name)
 		}
 		invokeLifecycle := func(lc fx.Lifecycle) {
 			lc.Append(fx.Hook{
 				OnStart: func(context.Context) error {
-					return runner.Start(dc.ctx)
+					return runner.Start(dc)
 				},
 				OnStop: func(context.Context) error {
-					return runner.Stop(dc.ctx)
+					return runner.Stop(dc)
 				},
 			})
 		}
 		invoke := fx.Invoke(
-			runner.PreStart(dc.ctx),
+			runner.PreStart(dc),
 			invokeLifecycle,
 		)
 		dc.fxOptions = fx.Options(dc.fxOptions, invoke)
@@ -56,10 +56,26 @@ type beanOption struct {
 	constructors []interface{}
 }
 
-func (o beanOption) apply(dc *dancong) {
+func (o beanOption) apply(dc *Dancong) {
 	dc.fxOptions = fx.Options(
 		dc.fxOptions,
 		fx.Provide(o.constructors...),
+	)
+}
+
+func WithLogger(logger *logrus.Logger) Option {
+	return loggerOption{logger: logger}
+}
+
+type loggerOption struct {
+	logger *logrus.Logger
+}
+
+func (o loggerOption) apply(dc *Dancong) {
+	dc.logger = o.logger
+	dc.fxOptions = fx.Options(
+		dc.fxOptions,
+		fx.Logger(o.logger),
 	)
 }
 
@@ -71,16 +87,18 @@ func WithConfig(filePath string) Option {
 	return configOption{filePath: filePath}
 }
 
-func (o configOption) apply(dc *dancong) {
+func (o configOption) apply(dc *Dancong) {
 	path := o.filePath
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Fatalf("Loading config(%s) failed: %s \n", path, err)
+		dc.logger.Fatalf("Loading config(%s) failed: %s \n", path, err)
 	}
-	err = yaml.Unmarshal(yamlFile, &dc.ctx.config)
+	var config map[string]interface{}
+	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		log.Fatalf("Loading config(%s) failed: %s \n", path, err)
+		dc.logger.Fatalf("Loading config(%s) failed: %s \n", path, err)
 	}
+	dc.ctx.SetConfig(config)
 }
 
 // Option Group
@@ -90,7 +108,7 @@ func Options(opts ...Option) Option {
 	return options(opts)
 }
 
-func (opts options) apply(dc *dancong) {
+func (opts options) apply(dc *Dancong) {
 	for _, opt := range opts {
 		opt.apply(dc)
 	}
