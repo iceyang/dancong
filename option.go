@@ -4,7 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 
-	logrus "github.com/sirupsen/logrus"
+	"github.com/iceyang/dancong/internal/log"
 	"go.uber.org/fx"
 	"gopkg.in/yaml.v2"
 )
@@ -63,12 +63,12 @@ func (o beanOption) apply(dc *Dancong) {
 	)
 }
 
-func WithLogger(logger *logrus.Logger) Option {
+func WithLogger(logger log.Printer) Option {
 	return loggerOption{logger: logger}
 }
 
 type loggerOption struct {
-	logger *logrus.Logger
+	logger log.Printer
 }
 
 func (o loggerOption) apply(dc *Dancong) {

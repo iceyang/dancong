@@ -2,7 +2,6 @@ package dancong
 
 import (
 	"github.com/iceyang/dancong/internal/log"
-	logrus "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 )
 
@@ -12,7 +11,7 @@ type Dancong struct {
 	// the initial options
 	opts options
 
-	logger *logrus.Logger
+	logger log.Printer
 
 	// fx module
 	fxApp     *fx.App
@@ -42,7 +41,7 @@ func (dc *Dancong) GetContext() *Context {
 	return dc.ctx
 }
 
-func (dc *Dancong) GetLogger() *logrus.Logger {
+func (dc *Dancong) GetLogger() log.Printer {
 	return dc.logger
 }
 

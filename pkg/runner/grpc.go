@@ -30,7 +30,7 @@ func (runner *grpcRunner) Start(dc *dancong.Dancong) error {
 	ctx := dc.GetContext()
 	v, _ := ctx.GetConfig("grpc.addr")
 	addr := v.(string)
-	dc.GetLogger().Infof("[Dancong] Starting GRPC server. Listening at %s\n", addr)
+	dc.GetLogger().Infof("Starting GRPC server. Listening at %s\n", addr)
 	go func() {
 		lis, err := net.Listen("tcp", fmt.Sprintf(addr))
 		if err != nil {

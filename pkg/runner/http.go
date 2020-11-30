@@ -30,7 +30,7 @@ func (runner *httpRunner) Start(dc *dancong.Dancong) error {
 	ctx := dc.GetContext()
 	v, _ := ctx.GetConfig("http.addr")
 	addr := v.(string)
-	dc.GetLogger().Infof("[Dancong] Starting HTTP server. Listening at %s\n", addr)
+	dc.GetLogger().Infof("Starting HTTP server. Listening at %s\n", addr)
 	go func() {
 		runner.server = &http.Server{
 			Addr:    addr,
